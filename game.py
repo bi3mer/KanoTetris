@@ -3,25 +3,24 @@ from communitysdk import RetailPixelKitSerial as PixelKit
 from time import sleep
 
 from KanoVertical import KanoVertical
+import RandomHex
 
 devices = list_connected_devices()
 pk_filter = filter(lambda device: isinstance(device, PixelKit), devices)
 pk = next(pk_filter, None) # Get first Pixel Kit
 
 if pk != None:
-	# Sample lighting of the four corners with KanoVertical
 	kano = KanoVertical()
-	kano.set(0, 0, '#ff0000')
-	kano.set(7,0, '#00ff00')
-	kano.set(0, 15,'#0000ff')
-	kano.set(7, 15, '#ffff00')
-
+	
 	'''
-	We will send a frame every 0.1 seconds to Pixel Kit (10 frames
-    per second). It's important to keep sending frames to the Pixel Kit,
-    otherwise it will go back to the mode it was before.
+	Seems like 10 frames per a second is the minimum speed else Pixel Kit
+	will thin we have finished.
 	'''
 	while True:
+		for y in range(kano.height):
+			for x in range(kano.width):
+				kano.set(x, y, RandomHex.generate())
+
 		pk.stream_frame(kano.frame)
 		sleep(0.1)
 else:
